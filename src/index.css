@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  /* Surface: warm paper white (Apple-style light) */
+  --color-paper: #fafaf8;
+  --color-ink-950: #f4f4f1;
+  --color-ink-900: #ffffff;
+  --color-ink-850: #f7f7f4;
+  --color-ink-800: #efefeb;
+  --color-ink-700: #e4e4df;
+
+  /* Warm hairlines */
+  --color-line: rgba(28, 25, 18, 0.09);
+  --color-line-strong: rgba(28, 25, 18, 0.2);
+
+  /* Accent: hydraulic blue */
+  --color-accent: #1d4ed8;
+  --color-accent-soft: #3b6ae0;
+  --color-accent-dim: rgba(29, 78, 216, 0.08);
+
+  /* Highlight, deep amber for readability on white */
+  --color-cream: #8a5a1e;
+
+  /* Text */
+  --color-fog: #4b5563;
+  --color-fog-dim: #8b9097;
+
+  --font-sans: "Google Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: #fafaf8;
+  color: #17181a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection { background: rgba(29, 78, 216, 0.18); color: #111; }
+
+/* Copy protection (client req #4), disabled on enquiry/contact surfaces */
+.copy-protected, .copy-protected * { user-select: none; -webkit-user-select: none; }
+.copy-protected ::selection { background: transparent; }
+.copy-allowed, .copy-allowed * { user-select: text !important; -webkit-user-select: text !important; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+*:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 3px; border-radius: 4px; }
+
+.lead-p { line-height: 1.8; letter-spacing: 0.002em; }
+
+.flipbook .stf__parent { margin: 0 auto; }
+.flipbook-page { background: #fdfcf9; color: #1a1b1e; overflow: hidden; }
+
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.animate-marquee { animation: marquee 46s linear infinite; }
+.animate-marquee:hover { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+  html { scroll-behavior: auto; }
+}

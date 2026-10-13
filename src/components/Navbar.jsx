@@ -10,7 +10,7 @@ const NAV = [
 
 function Logo({ compact = false }) {
   return (
-    <Link to="/" className="flex items-center gap-2.5 group" aria-label="HIC Hydraulic home">
+    <Link to="/" id="hic-navbar-logo" className="flex items-center gap-2.5 group" aria-label="HIC Hydraulic home">
       <span className="relative grid h-9 w-9 place-items-center rounded-[10px] bg-neutral-900 text-[13px] font-bold tracking-tight text-white transition-colors group-hover:bg-accent">
         HIC
         <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-accent ring-2 ring-paper" />
@@ -25,7 +25,7 @@ function Logo({ compact = false }) {
   )
 }
 
-export function Navbar() {
+export function Navbar({ logoVisible = true }) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const loc = useLocation()
@@ -45,7 +45,7 @@ export function Navbar() {
         scrolled ? "bg-white/80 backdrop-blur-xl border-b border-line" : "bg-transparent border-b border-transparent"
       }`}
     >
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+      <nav className={`mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8 transition-opacity duration-300 ${logoVisible ? "opacity-100" : "opacity-0"}`}>
         <Logo compact={scrolled} />
         <div className="hidden items-center gap-1 md:flex">
           {NAV.map((n) => (

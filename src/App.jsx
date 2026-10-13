@@ -5,14 +5,23 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Navbar } from "./components/Navbar"
 import { Footer } from "./components/Footer"
 import { VoicePlayer, WhatsAppFloat, ToastContext } from "./components/Common"
+import PageLoader from "./components/PageLoader"
 import Home from "./pages/Home"
 import Products from "./pages/Products"
-import { VOICE_BRIEFS } from "./data/siteData"
+import { VOICE_BRIEFS, IMAGES, PRODUCTS, INDUSTRIES } from "./data/siteData"
 
 // Catalogue pulls in pdf.js + page-flip (~500KB), keep it out of first paint
 const Catalogue = lazy(() => import("./pages/Catalogue"))
 
 gsap.registerPlugin(ScrollTrigger)
+
+// Images rendered on Home — the loader waits for these (with timeout
+// fallbacks) so the page appears with all assets in place.
+const HOME_PRELOAD_URLS = [...new Set([
+  IMAGES.hero,
+  ...PRODUCTS.map(p => p.image),
+  ...INDUSTRIES.map(i => i.image),
+])]
 
 /* Client req #4: block copy/drag globally; surfaces marked .copy-allowed
    (forms, footer contact, newsletter) re-enable selection. */
@@ -46,8 +55,30 @@ function ScrollTop() {
 function Shell() {
   const { pathname } = useLocation()
   const [toast, setToast] = useState("")
+  const [showLoader, setShowLoader] = useState(true)
+  const [navLogoVisible, setNavLogoVisible] = useState(false)
+  const [assetsReady, setAssetsReady] = useState(false)
 
   useCopyProtection()
+
+  // Preload Home imagery up front; onload/onerror both count so a broken URL
+  // never traps the user behind the loader. The 8s cap is the final backstop.
+  useEffect(() => {
+    let cancelled = false
+    let settled = 0
+    const done = () => {
+      settled += 1
+      if (settled >= HOME_PRELOAD_URLS.length && !cancelled) setAssetsReady(true)
+    }
+    HOME_PRELOAD_URLS.forEach(src => {
+      const img = new Image()
+      img.onload = done
+      img.onerror = done
+      img.src = src
+    })
+    const fallback = setTimeout(() => { if (!cancelled) setAssetsReady(true) }, 8000)
+    return () => { cancelled = true; clearTimeout(fallback) }
+  }, [])
 
   const showToast = useCallback((msg) => {
     setToast(msg)
@@ -59,7 +90,14 @@ function Shell() {
   return (
     <ToastContext.Provider value={showToast}>
       <div className="copy-protected relative min-h-screen">
-        <Navbar />
+        {showLoader && (
+          <PageLoader
+            assetsReady={assetsReady}
+            onLanded={() => setNavLogoVisible(true)}
+            onDone={() => { setNavLogoVisible(true); setShowLoader(false) }}
+          />
+        )}
+        <Navbar logoVisible={navLogoVisible} />
         <main className="relative">
           <Routes>
             <Route path="/" element={<Home />} />
